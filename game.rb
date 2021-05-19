@@ -8,7 +8,16 @@ class Board
   end
 
   def check_guess_for_value(guess)
+    guess.reduce(0) do |sum, value|
+      if colour_in_code?(value)
+        sum += 1
+      end
+      sum
+    end
+  end
 
+  def colour_in_code?(guess_colour)
+    @code.any? { |code_colour| code_colour == guess_colour }
   end
 
   def check_guess_for_place(guess)
@@ -34,7 +43,7 @@ class Maker
   def set_code
     [nil, nil, nil, nil].each_with_index do |value, index|
       puts "#{@name}, please enter your colour for number #{index + 1} in your code."
-      @code[index] = gets.chomp
+      @code[index] = gets.chomp.upcase
     end
   end
 
@@ -55,12 +64,12 @@ class Breaker
     guess_array = []
     [nil, nil, nil, nil].each_with_index do |value, index|
       puts "#{@name}, please enter your guess for spot number #{index + 1}."
-      guess_array[index] = gets.chomp
+      guess_array[index] = gets.chomp.upcase
     end
     guess_array
   end
 end
 
 test = Board.new(['Y', 'R', 'G', 'B'])
-puts test.check_guess_for_value(['Y', 'R', 'G', 'B'])
-puts test.check_guess_for_place(['Y', 'R', 'G', 'B'])
+puts test.check_guess_for_value(['Y', 'G', 'R', 'X'])
+puts test.check_guess_for_place(['Y', 'R', 'Y', 'B'])
