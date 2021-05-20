@@ -1,20 +1,29 @@
 class Board
   attr_accessor :correct_place, :wrong_place
-  attr_reader :code
+  attr_reader :code, :game_over
 
   def initialize(code)
     @code = code
     @correct_place = 0
     @wrong_place = 0
+    @game_over = false
     puts 'The colours available to choose are (Y)ellow, (R)ed, (G)reen, (B)lue, (P)urple, and (O)range.'
   end
 
-  def play_round(breaker)
+  def play_game_breaker(breaker)
+    play_round_breaker(breaker) until @game_over
+  end
+
+  def play_round_breaker(breaker)
     guesses = breaker.make_guesses
     check_guess(guesses)
     puts guesses.join(' ')
-    puts "correct places: #{@correct_place}"
-    puts "wrong places but right number: #{@wrong_place}"
+    if @game_over
+      puts 'Congratulations! You\'ve guessed the code.'
+    else
+      puts "correct places: #{@correct_place}"
+      puts "wrong places but right number: #{@wrong_place}"
+    end
   end
 
   def check_guess(guesses)
@@ -26,8 +35,9 @@ class Board
         @wrong_place += 1
       end
     end
-    puts @correct_place
-    puts @wrong_place
+    if @correct_place == 4
+      @game_over = true
+    end
   end
 
   def check_guess_for_value(guess)
@@ -87,6 +97,4 @@ end
 test = Board.new(['Y', 'R', 'G', 'R'])
 keff = Breaker.new('keff')
 
-test.check_guess(['Y', 'R', 'Y', 'B'])
-
-test.play_round(keff)
+test.play_game_breaker(keff)
