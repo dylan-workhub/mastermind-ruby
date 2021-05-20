@@ -12,7 +12,9 @@ class Board
   def play_round(breaker)
     guesses = breaker.make_guesses
     check_guess(guesses)
-    puts "#{guesses} correct places: #{@correct_place} wrong places but right number: #{@wrong_place}"
+    puts guesses.join(' ')
+    puts "correct places: #{@correct_place}"
+    puts "wrong places but right number: #{@wrong_place}"
   end
 
   def check_guess(guesses)
@@ -53,7 +55,7 @@ class Maker
   end
 
   def set_code
-    [nil, nil, nil, nil].each_with_index do |value, index|
+    [nil, nil, nil, nil].each_with_index do |_value, index|
       puts "#{@name}, please enter your colour for number #{index + 1} in your code."
       @code[index] = gets.chomp.upcase
     end
