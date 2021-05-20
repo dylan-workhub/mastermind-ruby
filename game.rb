@@ -1,34 +1,42 @@
 class Board
+  attr_accessor :correct_place, :wrong_place
+  attr_reader :code
+
   def initialize(code)
     @code = code
+    @correct_place = 0
+    @wrong_place = 0
+    puts 'The colours available to choose are (Y)ellow, (R)ed, (G)reen, (B)lue, (P)urple, and (O)range.'
   end
 
-  def print_game_board
-
+  def check_guess(guess)
+    reset_keys
+    guess.each_with_index do |value, index|
+      if check_guess_for_place(value, index)
+        @correct_place += 1
+      elsif check_guess_for_value(value)
+        @wrong_place += 1
+      else
+        next
+      end
+    end
+    puts @correct_place
+    puts @wrong_place
   end
 
   def check_guess_for_value(guess)
-    guess.reduce(0) do |sum, value|
-      if colour_in_code?(value)
-        sum += 1
-      end
-      sum
-    end
+    @code.any? { |code_colour| code_colour == guess }
   end
 
-  def colour_in_code?(guess_colour)
-    @code.any? { |code_colour| code_colour == guess_colour }
+  def check_guess_for_place(guess, index)
+    guess == @code[index]
   end
 
-  def check_guess_for_place(guess)
-    index = 0
-    guess.reduce(0) do |sum, value|
-      if value == @code[index]
-        sum += 1
-      end
-      index += 1
-      sum
-    end
+  protected
+
+  def reset_keys
+    @correct_place = 0
+    @wrong_place = 0
   end
 end
 
@@ -71,5 +79,5 @@ class Breaker
 end
 
 test = Board.new(['Y', 'R', 'G', 'B'])
-puts test.check_guess_for_value(['Y', 'G', 'R', 'X'])
-puts test.check_guess_for_place(['Y', 'R', 'Y', 'B'])
+
+test.check_guess(['Y', 'R', 'Y', 'B'])
