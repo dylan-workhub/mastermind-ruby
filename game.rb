@@ -9,15 +9,19 @@ class Board
     puts 'The colours available to choose are (Y)ellow, (R)ed, (G)reen, (B)lue, (P)urple, and (O)range.'
   end
 
-  def check_guess(guess)
+  def play_round(breaker)
+    guesses = breaker.make_guesses
+    check_guess(guesses)
+    puts "#{guesses} correct places: #{@correct_place} wrong places but right number: #{@wrong_place}"
+  end
+
+  def check_guess(guesses)
     reset_keys
-    guess.each_with_index do |value, index|
+    guesses.each_with_index do |value, index|
       if check_guess_for_place(value, index)
         @correct_place += 1
       elsif check_guess_for_value(value)
         @wrong_place += 1
-      else
-        next
       end
     end
     puts @correct_place
@@ -78,6 +82,9 @@ class Breaker
   end
 end
 
-test = Board.new(['Y', 'R', 'G', 'B'])
+test = Board.new(['Y', 'R', 'G', 'R'])
+keff = Breaker.new('keff')
 
 test.check_guess(['Y', 'R', 'Y', 'B'])
+
+test.play_round(keff)
