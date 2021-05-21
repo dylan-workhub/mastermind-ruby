@@ -11,6 +11,7 @@ class Board
     ]
     @correct_place = 0
     @wrong_place = 0
+    @pegs = []
     @game_over = false
     puts 'The colours available to choose are (Y)ellow, (R)ed, (G)reen, (B)lue, (P)urple, and (O)range.'
   end
@@ -26,10 +27,10 @@ class Board
     check_guess(guesses)
     puts guesses.join(' ')
     if @game_over
-      puts 'Congratulations! You\'ve guessed the code.'
+      puts 'Congratulations! You\'ve broken the code.'
     else
-      puts "correct places: #{@correct_place}"
-      puts "wrong places but right colour: #{@wrong_place}"
+      generate_pegs
+      puts "Clues: #{@pegs.join(' ')}"
     end
   end
 
@@ -55,6 +56,12 @@ class Board
 
   def check_guess_for_place(guess, index)
     guess == @code[index][:colour]
+  end
+
+  def generate_pegs
+    @pegs = []
+    @correct_place.times { @pegs << '●' }
+    @wrong_place.times { @pegs << '○' }
   end
 
   protected
@@ -94,11 +101,12 @@ class Maker
 end
 
 class Breaker
-  attr_accessor :name, :number_of_guesses
+  attr_accessor :name, :number_of_guesses, :possible_colours
 
   def initialize(name)
     @name = name
     @number_of_guesses = 0
+    @possible_colours = %w[Y R G B P O]
   end
 
   def make_guesses
@@ -106,8 +114,16 @@ class Breaker
     [nil, nil, nil, nil].each_with_index do |value, index|
       puts "#{@name}, please enter your guess for spot number #{index + 1}."
       guess_array[index] = gets.chomp.upcase
+      until valid_guess(guess_array[index])
+        puts "Please enter a valid guess: #{@possible_colours.join(', ')}."
+        guess_array[index] = gets.chomp.upcase
+      end
     end
     guess_array
+  end
+
+  def valid_guess(guess)
+    guess.length == 1 && @possible_colours.any? { |colour| colour == guess }
   end
 end
 
