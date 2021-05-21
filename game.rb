@@ -2,8 +2,13 @@ class Board
   attr_accessor :correct_place, :wrong_place
   attr_reader :code, :game_over
 
-  def initialize(code)
-    @code = code
+  def initialize(code = %w[Y R G R])
+    @code = [
+      { colour: code[0], guessed: false },
+      { colour: code[1], guessed: false },
+      { colour: code[2], guessed: false },
+      { colour: code[3], guessed: false }
+    ]
     @correct_place = 0
     @wrong_place = 0
     @game_over = false
@@ -11,10 +16,12 @@ class Board
   end
 
   def play_game_breaker(breaker)
+    puts @code
     play_round_breaker(breaker) until @game_over
   end
 
   def play_round_breaker(breaker)
+    @code.each { |hash| hash[:guessed] = false }
     guesses = breaker.make_guesses
     check_guess(guesses)
     puts guesses.join(' ')
@@ -22,7 +29,7 @@ class Board
       puts 'Congratulations! You\'ve guessed the code.'
     else
       puts "correct places: #{@correct_place}"
-      puts "wrong places but right number: #{@wrong_place}"
+      puts "wrong places but right colour: #{@wrong_place}"
     end
   end
 
@@ -30,22 +37,28 @@ class Board
     reset_keys
     guesses.each_with_index do |value, index|
       if check_guess_for_place(value, index)
+        @code[index][:guessed] = true
         @correct_place += 1
-      elsif check_guess_for_value(value)
+      elsif check_guess_for_value(value, guesses)
         @wrong_place += 1
       end
     end
-    if @correct_place == 4
-      @game_over = true
-    end
+    @game_over = true if @correct_place == 4
   end
 
-  def check_guess_for_value(guess)
-    @code.any? { |code_colour| code_colour == guess }
+  def check_guess_for_value(guess, guesses)
+    @code.each_with_index do |value, index|
+      if value[:colour] == guess && value[:guessed] == false && value[:colour] != guesses[index]
+        return true
+      else
+        next
+      end
+    end
+    return false
   end
 
   def check_guess_for_place(guess, index)
-    guess == @code[index]
+    guess == @code[index][:colour]
   end
 
   protected
@@ -73,6 +86,13 @@ class Maker
 
   def make_game_board
     @board = Board.new(@code)
+  end
+
+  def self.generate_code
+    code = []
+    possible_colours = %w[Y R G B P O]
+    @code
+    code
   end
 end
 
