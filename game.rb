@@ -16,7 +16,7 @@ class Board
   end
 
   def play_game_breaker(breaker)
-    puts @code
+    @code = Maker.generate_code(@code)
     play_round_breaker(breaker) until @game_over
   end
 
@@ -48,13 +48,9 @@ class Board
 
   def check_guess_for_value(guess, guesses)
     @code.each_with_index do |value, index|
-      if value[:colour] == guess && value[:guessed] == false && value[:colour] != guesses[index]
-        return true
-      else
-        next
-      end
+      return true if value[:colour] == guess && value[:guessed] == false && value[:colour] != guesses[index]
     end
-    return false
+    false
   end
 
   def check_guess_for_place(guess, index)
@@ -88,11 +84,12 @@ class Maker
     @board = Board.new(@code)
   end
 
-  def self.generate_code
-    code = []
+  def self.generate_code(board_code)
+    puts board_code.join(' ')
     possible_colours = %w[Y R G B P O]
-    @code
-    code
+    board_code.each { |hash| hash[:colour] = possible_colours.sample }
+    puts board_code
+    board_code
   end
 end
 
