@@ -16,6 +16,23 @@ class Board
     puts 'The colours available to choose are (Y)ellow, (R)ed, (G)reen, (B)lue, (P)urple, and (O)range.'
   end
 
+  def choose_game_mode
+    puts 'Please choose whether you\'d like to be the maker or the breaker of the code: '
+    puts 'Press "1" for Maker, "2" for Breaker.'
+    choice = gets.chomp
+    until %w[1 2].include?(choice)
+      puts 'Please enter a valid choice: '
+      puts 'Press "1" for Maker, "2" for Breaker.'
+      choice = gets.chomp
+    end
+    run_game_choice(choice)
+  end
+
+  def run_game_choice(choice)
+    play_game_breaker(Breaker.new('User')) if choice == '2'
+    play_game_maker(Maker.new('User')) if choice == '1'
+  end
+
   def play_game_breaker(breaker)
     @code = Maker.generate_code(@code)
     play_round_breaker(breaker) until @game_over
@@ -130,4 +147,4 @@ end
 test = Board.new(['Y', 'R', 'G', 'R'])
 keff = Breaker.new('keff')
 
-test.play_game_breaker(keff)
+test.choose_game_mode
