@@ -1,19 +1,19 @@
+# Class for all things related to the board, playing the game, printing the clues, etc.
 class Board
   attr_accessor :correct_place, :wrong_place
   attr_reader :code, :game_over
 
-  def initialize(code = %w[Y R G R])
+  def initialize(code = [1, 2, 3, 4, 5, 6])
     @code = [
-      { colour: code[0], guessed: false },
-      { colour: code[1], guessed: false },
-      { colour: code[2], guessed: false },
-      { colour: code[3], guessed: false }
+      { number: code[0], guessed: false },
+      { number: code[1], guessed: false },
+      { number: code[2], guessed: false },
+      { number: code[3], guessed: false }
     ]
     @correct_place = 0
     @wrong_place = 0
     @pegs = []
     @game_over = false
-    puts 'The colours available to choose are (Y)ellow, (R)ed, (G)reen, (B)lue, (P)urple, and (O)range.'
   end
 
   def choose_game_mode
@@ -35,6 +35,7 @@ class Board
 
   def play_game_breaker(breaker)
     @code = Maker.generate_code(@code)
+    puts @code
     play_round_breaker(breaker) until @game_over
   end
 
@@ -66,19 +67,13 @@ class Board
 
   def check_guess_for_value(guess, guesses)
     @code.each_with_index do |value, index|
-      return true if value[:colour] == guess && value[:guessed] == false && value[:colour] != guesses[index]
+      return true if value[:number] == guess && value[:guessed] == false && value[:number] != guesses[index]
     end
     false
   end
 
   def check_guess_for_place(guess, index)
-    guess == @code[index][:colour]
-  end
-
-  def generate_pegs
-    @pegs = []
-    @correct_place.times { @pegs << '●' }
-    @wrong_place.times { @pegs << '○' }
+    guess == @code[index][:number]
   end
 
   protected
@@ -87,8 +82,15 @@ class Board
     @correct_place = 0
     @wrong_place = 0
   end
+
+  def generate_pegs
+    @pegs = []
+    @correct_place.times { @pegs << '●' }
+    @wrong_place.times { @pegs << '○' }
+  end
 end
 
+# Class for making code, for both player and computer.
 class Maker
   attr_reader :code, :board
 
@@ -99,8 +101,8 @@ class Maker
 
   def set_code
     [nil, nil, nil, nil].each_with_index do |_value, index|
-      puts "#{@name}, please enter your colour for number #{index + 1} in your code."
-      @code[index] = gets.chomp.upcase
+      puts "#{@name}, please enter your number for guess #{index + 1} in your code."
+      @code[index] = gets.chomp.to_i
     end
   end
 
@@ -109,42 +111,55 @@ class Maker
   end
 
   def self.generate_code(board_code)
-    puts board_code.join(' ')
-    possible_colours = %w[Y R G B P O]
-    board_code.each { |hash| hash[:colour] = possible_colours.sample }
-    puts board_code
+    possible_numbers = [1, 2, 3, 4, 5, 6]
+    board_code.each { |hash| hash[:number] = possible_numbers.sample }
     board_code
   end
 end
 
+# Class for breaking the code, for both player and computer.
 class Breaker
-  attr_accessor :name, :number_of_guesses, :possible_colours
+  attr_accessor :name, :number_of_guesses, :possible_numbers
 
   def initialize(name)
     @name = name
     @number_of_guesses = 0
-    @possible_colours = %w[Y R G B P O]
+    @possible_numbers = [1, 2, 3, 4, 5, 6]
   end
 
   def make_guesses
     guess_array = []
     [nil, nil, nil, nil].each_with_index do |value, index|
       puts "#{@name}, please enter your guess for spot number #{index + 1}."
-      guess_array[index] = gets.chomp.upcase
+      guess_array[index] = gets.chomp.to_i
       until valid_guess(guess_array[index])
-        puts "Please enter a valid guess: #{@possible_colours.join(', ')}."
-        guess_array[index] = gets.chomp.upcase
+        puts "Please enter a valid guess: #{@possible_numbers.join(', ')}."
+        guess_array[index] = gets.chomp.to_i
       end
     end
     guess_array
   end
 
   def valid_guess(guess)
-    guess.length == 1 && @possible_colours.any? { |colour| colour == guess }
+    guess.to_s.length == 1 && @possible_numbers.any? { |number| number == guess }
+  end
+
+  def computer_guess_code
+    @possible_codes = make_possible_codes
+    p @possible_codes.length
+    until game_won
+      guess = 1122
+    end
+  end
+
+  def make_possible_codes
+    [1, 2, 3, 4, 5, 6].repeated_permutation(4).to_a
   end
 end
 
 test = Board.new(['Y', 'R', 'G', 'R'])
 keff = Breaker.new('keff')
+
+keff.computer_guess_code
 
 test.choose_game_mode
